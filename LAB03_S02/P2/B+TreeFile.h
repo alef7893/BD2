@@ -13,8 +13,32 @@ class BPlusTreeFile {
     private:
         std::string fileName;
         Page* root;
-        PageLeaf* first;
     public:
+        explicit BPlusTreeFile(std::string f): fileName(std::move(f)), root(nullptr) {
+            // Aquí se debe implementar un algoritmo que pueda armar el B+Tree
+        };
+
+        Record find(char key[4]) {
+            Record record {};
+            if(root != nullptr) {
+                Page* node = root;
+                while(!node->isLeaf())
+                    node = node->nextPage(key);
+                int pos = node->search(key);
+                if(pos != -1) {
+                    std::ifstream file(fileName, std::ios::binary);
+                    if (file.is_open()) {
+                        file.seekg(pos * sizeof(Record), std::ios::beg);
+                        file.read((char*) &record, sizeof(Record));
+                    } else throw("Archivo no encontrado");
+                    file.close();
+                }
+            }
+            return record;
+        };
+};
+
+/*
         explicit BPlusTreeFile(std::string f): fileName(std::move(f)), root(nullptr), first(nullptr) {
             std::ifstream file(fileName, std::ios::binary);
             if (file.is_open()) {
@@ -60,6 +84,6 @@ class BPlusTreeFile {
                 leaf = leaf->next;
             }
         };
-};
+        */
 
 #endif //LAB_B_TREEFILE_H

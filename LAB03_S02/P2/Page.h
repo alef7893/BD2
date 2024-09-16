@@ -15,7 +15,8 @@ class Page {
         Page() = default;
         virtual ~Page() = 0;
         virtual bool isLeaf() = 0;
-        virtual Page* find(char key[4]) = 0;
+        virtual Page* nextPage(char key[4]) = 0;
+        virtual int search(char key[4]) = 0;
 };
 Page::~Page() = default;
 
@@ -28,48 +29,40 @@ class PageInternal : public Page {
         };
         ~PageInternal() override = default;
 
-        bool insert(char key[4], Page* first, Page* second) {
-            if (size < fb) {
-                for (short index = 0; index < size; index++) {
-                    if (std::strncmp(&key[0], &arrayKey[index][0], 4) < 0) {
-                        for(int c=0; c<4; c++)
-                            std::swap(arrayKey[index][c], key[c]);
-                        std::swap(arrayNode[index],first);
-                        std::swap(first, second);
-                        first = second;
-                    }
-                }
-                std::strncpy(arrayKey[size], key, 4);
-                arrayPosFile[size] = posFile;
-                size++;
-                return true;
-            }
-            return false;
-        };
-
         bool isLeaf() override {return false;};
 
-        Page* find(char key[4]) override {
+        Page* nextPage(char key[4]) override {
             for(short index = 0; index < size; index++)
                 if (key < arrayKey[index]) return arrayNode[index];
             return arrayNode[size];
         };
+
+        int search(char key[4]) override {return -1;};
 };
 
 class PageLeaf : public Page {
     private:
-        int arrayPosFile[fb] {};
+        int arrayPosFile[fb];
     public:
         PageLeaf* next;
 
-        PageLeaf(): next(nullptr) {
-            size = 0;
-            std::fill(std::begin(arrayPosFile), std::end(arrayPosFile), -1);
-        };
+        PageLeaf(int posFile): next(nullptr) { size = 0; };
 
         ~PageLeaf() override = default;
 
-        bool insert(char key[4], int &posFile) {
+        bool isLeaf() override {return true;};
+
+        Page* nextPage(char key[4]) override { return nullptr; };
+
+        int search(char key[4]) override {
+            for(short index = 0; index < size; index++)
+                if (std::strncmp(&key[0], &arrayKey[index][0], 4) == 0) return arrayPosFile[index];
+            return -1;
+        };
+};
+
+/*
+bool insert(char key[4], int &posFile) {
             if (size < fb) {
                 for (short index = 0; index < size; index++) {
                     if (std::strncmp(&key[0], &arrayKey[index][0], 4) < 0) {
@@ -85,16 +78,6 @@ class PageLeaf : public Page {
             }
             return false;
         };
-
-        bool isLeaf() override {return true;};
-
-        Page* find(char key[4]) override { return nullptr; };
-
-        void printKeys() {
-            std::cout << "\nImprimiendo datos de la pagina: ";
-            for(short index = 0; index < size; index++)
-                std::cout << "\n - " << arrayKey[index] << " - " << arrayPosFile[index];
-        }
-};
+ * */
 
 #endif //LAB_PAGE_H
