@@ -1,0 +1,3 @@
+C:/Users/aleja/OneDrive/Escritorio/2024_2/Base_de_Datos_2/S04/Lab/cmake-build-debug/CMakeFiles/Lab.dir
+C:/Users/aleja/OneDrive/Escritorio/2024_2/Base_de_Datos_2/S04/Lab/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/aleja/OneDrive/Escritorio/2024_2/Base_de_Datos_2/S04/Lab/cmake-build-debug/CMakeFiles/rebuild_cache.dir
